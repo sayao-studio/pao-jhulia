@@ -12,7 +12,7 @@ Site de encomendas dos pães caseiros da Jhulia, com retirada na Escola Praia do
 | Caminho | O que é |
 |---|---|
 | `docs/` | O site (HTML/CSS/JS puro, sem build), servido pelo GitHub Pages |
-| `docs/dados.js` | Produtos, preços, ponto de retirada e WhatsApp: é só aqui que se mexe |
+| `docs/dados.js` | Produtos, preços, ponto de retirada, prazo, feriados (`SEM_RETIRADA`) e WhatsApp: é só aqui que se mexe |
 | `docs/app.js` | Cardápio, carrinho e mensagem do pedido pro WhatsApp |
 | `docs/img/` | Fotos recortadas (`.webp`) e ilustrações provisórias (`.svg`) |
 | `ferramentas/preparar-fotos.py` | Gera os `.webp` e a `capa.jpg` a partir de `referencia/` (fora do git) |
@@ -22,6 +22,7 @@ Site de encomendas dos pães caseiros da Jhulia, com retirada na Escola Praia do
 ```bash
 npm run serve        # http://127.0.0.1:8790
 npm test             # testes de dados.js
+npm run test:ui      # navegador: Chromium (desktop e celular) e Firefox, 4 workers
 ```
 
 Pra trocar uma ilustração por foto de verdade: ponha a foto em `referencia/`, inclua o

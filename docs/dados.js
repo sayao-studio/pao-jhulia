@@ -2,7 +2,8 @@
    ATENÇÃO: site de demonstração. Preços vieram da Jhulia (30/10/2026); dias,
    horário e ingredientes são EXEMPLO. Fotos marcadas com `ilustrativa` são fictícias. */
 export const DEMO = true;
-export const WHATSAPP = "554884227982";
+export const WHATSAPP = "554884227982";            // como ela passou: +55 48 8422-7982
+export const TELEFONE = "(48) 98422-7982";          // celular de SC com o 9 na frente, pra quem for ligar/salvar
 export const NOME = "Jhulia";
 
 // Categorias na ordem em que aparecem no cardápio.
@@ -39,7 +40,12 @@ export const PONTOS = [
 
 export const NOMES_DIA = ["domingo", "segunda", "terça", "quarta", "quinta", "sexta", "sábado"];
 export const DIAS_A_FRENTE = 14;      // datas oferecidas no pedido
-export const ANTECEDENCIA_H = 24;     // pedido com pelo menos 1 dia de antecedência
+export const PRAZO_HORA = 20;         // pedido até as 20h do dia anterior à retirada
+
+// Dias sem aula/retirada (feriados). Férias escolares: acrescentar aqui quando ela confirmar.
+export const SEM_RETIRADA = [
+  "2026-11-02", "2026-11-20", "2026-12-24", "2026-12-25", "2026-12-31", "2027-01-01"
+];
 
 /* ---------- funções puras ---------- */
 
@@ -55,15 +61,19 @@ export function totalDe(carrinho) {
   return { itens, valor };
 }
 
-// Próximas datas com retirada, a partir de `agora` respeitando a antecedência.
+export const isoDia = d =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+
+// Próximas datas com retirada: dia de retirada do ponto, fora dos feriados, e
+// pedido feito antes das PRAZO_HORA do dia anterior.
 export function proximasDatas(agora = new Date()) {
-  const limite = new Date(agora.getTime() + ANTECEDENCIA_H * 3600e3);
   const out = [];
-  for (let i = 0; i <= DIAS_A_FRENTE; i++) {
+  for (let i = 1; i <= DIAS_A_FRENTE; i++) {
     const d = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate() + i);
-    const fimDoDia = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 23, 59);
+    const prazo = new Date(d.getFullYear(), d.getMonth(), d.getDate() - 1, PRAZO_HORA);
+    if (agora >= prazo || SEM_RETIRADA.includes(isoDia(d))) continue;
     for (const ponto of PONTOS) {
-      if (ponto.dias.includes(d.getDay()) && fimDoDia >= limite) out.push({ data: d, ponto });
+      if (ponto.dias.includes(d.getDay())) out.push({ data: d, ponto });
     }
   }
   return out;
