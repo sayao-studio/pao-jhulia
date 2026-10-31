@@ -31,7 +31,7 @@ const enviar = page => page.getByRole("button", { name: "Enviar pelo WhatsApp" }
 
 test("carrega sem erro no console e mostra o aviso de demonstração", async ({ page }) => {
   const e = erros(page);
-  await page.goto("/");
+  await page.goto("./");
   await expect(page.locator(".demo")).toContainText("demonstração");
   await expect(page.locator(".card")).toHaveCount(PRODUTOS.length);
   await expect(page.locator("[data-preco-min]")).toHaveText("R$ 20");
@@ -39,7 +39,7 @@ test("carrega sem erro no console e mostra o aviso de demonstração", async ({ 
 });
 
 test("todas as imagens carregam", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("./");
   for (let y = 0; y < 20; y++) await page.mouse.wheel(0, 1200);
   await page.waitForLoadState("networkidle");
   const quebradas = await page.$$eval("img", imgs =>
@@ -48,7 +48,7 @@ test("todas as imagens carregam", async ({ page }) => {
 });
 
 test("ilustrações fictícias vêm marcadas como ilustrativas", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("./");
   for (const x of PRODUTOS) {
     const marca = card(page, x.id).locator(".ilustra");
     await expect(marca).toHaveCount(x.ilustrativa ? 1 : 0);
@@ -56,7 +56,7 @@ test("ilustrações fictícias vêm marcadas como ilustrativas", async ({ page }
 });
 
 test("filtros mostram só a categoria escolhida e mantêm o pedido", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("./");
   await adicionar(page, "pesto").click();
   for (const c of CATEGORIAS) {
     await page.getByRole("button", { name: c.nome, exact: true }).click();
@@ -70,7 +70,7 @@ test("filtros mostram só a categoria escolhida e mantêm o pedido", async ({ pa
 });
 
 test("Adicionar vira contador, e tirar o último volta pro Adicionar", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("./");
   await expect(page.locator("#barra")).not.toHaveClass(/ver/);
   await expect(page.locator("#contador")).toBeHidden();
 
@@ -96,7 +96,7 @@ test("Adicionar vira contador, e tirar o último volta pro Adicionar", async ({ 
 });
 
 test("botão do destaque no topo põe o pão de parmesão no pedido", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("./");
   const b = page.locator("[data-add]");
   await b.click();
   await expect(b).toHaveText(/Adicionado/);
@@ -108,14 +108,14 @@ test("botão do destaque no topo põe o pão de parmesão no pedido", async ({ p
 
 test("quantidade não passa de 30", async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem("paes-carrinho", JSON.stringify({ tradicional: 29 })));
-  await page.goto("/");
+  await page.goto("./");
   await mais(page, "tradicional").click();
   await expect(qtd(page, "tradicional")).toHaveText("30");
   await expect(mais(page, "tradicional")).toBeDisabled();
 });
 
 test("dá pra mexer na quantidade e limpar direto no resumo", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("./");
   await adicionar(page, "tradicional").click();
   await adicionar(page, "pesto").click();
   const linha = page.locator('#resumo li[data-id="tradicional"]');
@@ -132,7 +132,7 @@ test("dá pra mexer na quantidade e limpar direto no resumo", async ({ page }) =
 });
 
 test("pedido continua lá depois de recarregar a página", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("./");
   await adicionar(page, "calabresa").click();
   await page.reload();
   await expect(qtd(page, "calabresa")).toHaveText("1");
@@ -143,7 +143,7 @@ test("carrinho salvo estragado não quebra o site", async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem("paes-carrinho",
     JSON.stringify({ "nao-existe": 3, tradicional: 1, pesto: "abc", geleia: -2, azeitona: 2.5, parmesao: 999, calabresa: true })));
   const e = erros(page);
-  await page.goto("/");
+  await page.goto("./");
   await expect(page.locator("#barraItens")).toHaveText("1 item");   // só o tradicional vale
   await expect(adicionar(page, "pesto")).toBeVisible();
   await expect(adicionar(page, "parmesao")).toBeVisible();
@@ -154,13 +154,13 @@ test("carrinho salvo estragado não quebra o site", async ({ page }) => {
 test("carrinho salvo que não é objeto é ignorado", async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem("paes-carrinho", "[1,2,3]"));
   const e = erros(page);
-  await page.goto("/");
+  await page.goto("./");
   await expect(page.locator("#resumo .vazio")).toBeVisible();
   expect(e).toEqual([]);
 });
 
 test("datas do pedido: só dias de retirada, com 1 dia de antecedência", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("./");
   const opcoes = await page.locator("#quando option").allTextContents();
   expect(opcoes[0]).toBe("Escolha uma data");
   expect(opcoes[1]).toContain("terça, 03/11");      // fim de semana não tem, segunda 02/11 é Finados
@@ -171,7 +171,7 @@ test("datas do pedido: só dias de retirada, com 1 dia de antecedência", async 
 });
 
 test("ponto de retirada aparece marcado como exemplo, com os dias", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("./");
   await expect(page.locator("#onde .exemplo")).toBeVisible();
   await expect(page.locator(".ponto")).toHaveCount(PONTOS.length);
   await expect(page.locator(".ponto")).toContainText("Escola Praia do Riso");
@@ -180,7 +180,7 @@ test("ponto de retirada aparece marcado como exemplo, com os dias", async ({ pag
 });
 
 test("enviar sem item ou sem data mostra o erro e não abre o WhatsApp", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("./");
   await enviar(page).click();
   await expect(page.locator("#erro")).toContainText("pelo menos um item");
   await adicionar(page, "tradicional").click();
@@ -193,7 +193,7 @@ test("enviar sem item ou sem data mostra o erro e não abre o WhatsApp", async (
 });
 
 test("enviar abre o WhatsApp dela com a mensagem completa e lembra o nome", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("./");
   await adicionar(page, "parmesao").click();
   await mais(page, "parmesao").click();
   await adicionar(page, "pesto").click();
@@ -219,14 +219,14 @@ test("enviar abre o WhatsApp dela com a mensagem completa e lembra o nome", asyn
 });
 
 test("links de contato apontam pro WhatsApp dela", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("./");
   await expect(page.locator("#zapRodape")).toHaveAttribute("href", `https://wa.me/${WHATSAPP}`);
   await expect(page.locator("#zapPonto")).toHaveAttribute("href", new RegExp(`^https://wa.me/${WHATSAPP}\\?text=`));
   await expect(page.locator("#zapRodape")).toHaveText("(48) 98422-7982");
 });
 
 test("barra do pedido some quando o formulário está na tela", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("./");
   await adicionar(page, "tradicional").click();
   await expect(page.locator("#barra")).toBeVisible();
   await page.locator("#form").scrollIntoViewIfNeeded();
@@ -235,7 +235,7 @@ test("barra do pedido some quando o formulário está na tela", async ({ page })
 
 test("teclado: monta o pedido e o foco não se perde ao trocar Adicionar pelo contador", async ({ page }, info) => {
   test.skip(info.project.name.startsWith("celular"), "teclado não se aplica ao celular");
-  await page.goto("/");
+  await page.goto("./");
   const alvo = adicionar(page, "tradicional");
   for (let i = 0; i < 60 && !(await alvo.evaluate(el => el === document.activeElement)); i++) {
     await page.keyboard.press("Tab");
@@ -256,7 +256,7 @@ test("teclado: monta o pedido e o foco não se perde ao trocar Adicionar pelo co
 for (const largura of [320, 360, 390, 768, 1024, 1440]) {
   test(`sem rolagem horizontal em ${largura}px, com pedido montado`, async ({ page }) => {
     await page.setViewportSize({ width: largura, height: 800 });
-    await page.goto("/");
+    await page.goto("./");
     await adicionar(page, "tradicional").click();
     await adicionar(page, "geleia").click();
     await page.locator("#form").scrollIntoViewIfNeeded();
@@ -266,7 +266,7 @@ for (const largura of [320, 360, 390, 768, 1024, 1440]) {
 }
 
 test("botões de toque têm pelo menos 32px", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("./");
   await adicionar(page, "tradicional").click();
   const pequenos = await page.$$eval(".qtd button, .filtro, .btn, .add", els =>
     els.filter(e => e.offsetParent).map(e => e.getBoundingClientRect())
@@ -276,14 +276,14 @@ test("botões de toque têm pelo menos 32px", async ({ page }) => {
 
 test("no celular os campos têm fonte ≥ 16px (o iPhone não dá zoom ao tocar)", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("/");
+  await page.goto("./");
   const pequenas = await page.$$eval("input, select, textarea", els =>
     els.map(e => parseFloat(getComputedStyle(e).fontSize)).filter(t => t < 16));
   expect(pequenas).toEqual([]);
 });
 
 test("acessibilidade: nenhum problema sério ou crítico no axe", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("./");
   await adicionar(page, "tradicional").click();
   const r = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze();
   const graves = r.violations.filter(v => ["serious", "critical"].includes(v.impact))
@@ -292,7 +292,7 @@ test("acessibilidade: nenhum problema sério ou crítico no axe", async ({ page 
 });
 
 test("SEO básico: título, descrição, idioma e noindex enquanto for demo", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("./");
   await expect(page).toHaveTitle(/Pães da Jhulia/);
   await expect(page.locator('meta[name="description"]')).toHaveAttribute("content", /.{50,}/);
   await expect(page.locator("html")).toHaveAttribute("lang", "pt-BR");
@@ -301,7 +301,7 @@ test("SEO básico: título, descrição, idioma e noindex enquanto for demo", as
 });
 
 test("prévia do link (WhatsApp) aponta pro endereço publicado e a imagem existe", async ({ page, request }) => {
-  await page.goto("/");
+  await page.goto("./");
   const og = x => page.locator(`meta[property="og:${x}"]`).getAttribute("content");
   expect(await og("url")).toBe("https://sayao-studio.github.io/pao-jhulia/");
   const img = await og("image");
@@ -313,7 +313,7 @@ test("prévia do link (WhatsApp) aponta pro endereço publicado e a imagem exist
 });
 
 test("marca d'água não bloqueia clique e rodapé tem aviso de direitos", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("./");
   const marca = page.locator(".marca-dagua");
   await expect(marca).toHaveAttribute("aria-hidden", "true");
   expect(await marca.evaluate(el => getComputedStyle(el).pointerEvents)).toBe("none");
@@ -321,18 +321,18 @@ test("marca d'água não bloqueia clique e rodapé tem aviso de direitos", async
 });
 
 test("o site não expõe a vida pessoal dela", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("./");
   await expect(page.locator("body")).not.toContainText(/solteira/i);
 });
 
 test("prazo do pedido aparece junto do formulário", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("./");
   await expect(page.locator("#prazo")).toHaveText("Pedidos até as 20h do dia anterior à retirada.");
   await expect(page.locator("#quando")).toHaveAttribute("aria-describedby", /prazo/);
 });
 
 test("data que venceu com a aba aberta é recusada no envio", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("./");
   await adicionar(page, "tradicional").click();
   await page.locator("#quando").selectOption({ label: "terça, 03/11 · Escola Praia do Riso" });
   await page.clock.setFixedTime(new Date("2026-11-02T21:00:00-03:00"));   // passou do prazo de terça
@@ -344,7 +344,7 @@ test("data que venceu com a aba aberta é recusada no envio", async ({ page }) =
 });
 
 test("se o navegador bloquear a aba nova, abre o WhatsApp na mesma aba", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("./");
   await page.evaluate(() => { window.open = () => null; });
   await page.route("https://wa.me/**", rota => rota.fulfill({ body: "ok whatsapp" }));
   await adicionar(page, "tradicional").click();
@@ -354,7 +354,7 @@ test("se o navegador bloquear a aba nova, abre o WhatsApp na mesma aba", async (
 });
 
 test("Limpar pode ser desfeito", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("./");
   await adicionar(page, "tradicional").click();
   await adicionar(page, "pesto").click();
   await page.getByRole("button", { name: "Limpar", exact: true }).click();
@@ -368,7 +368,7 @@ test("Limpar pode ser desfeito", async ({ page }) => {
 
 test("teclado: filtros e resumo não jogam o foco pro topo", async ({ page }, info) => {
   test.skip(info.project.name.startsWith("celular"), "teclado não se aplica ao celular");
-  await page.goto("/");
+  await page.goto("./");
   const pra = page.getByRole("button", { name: "Pra acompanhar", exact: true });
   await pra.focus();
   await page.keyboard.press("Enter");
@@ -393,7 +393,7 @@ test("teclado: filtros e resumo não jogam o foco pro topo", async ({ page }, in
 
 test("destaque do topo avisa quando já está no limite", async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem("paes-carrinho", JSON.stringify({ parmesao: 30 })));
-  await page.goto("/");
+  await page.goto("./");
   await page.locator("[data-add]").click();
   await expect(page.locator("[data-add]")).toHaveText("Limite do pedido");
   await expect(qtd(page, "parmesao")).toHaveText("30");
@@ -401,7 +401,7 @@ test("destaque do topo avisa quando já está no limite", async ({ page }) => {
 
 test("barra do pedido não cobre o fim do rodapé", async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 700 });
-  await page.goto("/");
+  await page.goto("./");
   await adicionar(page, "tradicional").click();
   await page.evaluate(() => scrollTo({ top: document.body.scrollHeight, behavior: "instant" }));
   await page.waitForTimeout(400);
